@@ -4,210 +4,148 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+
 
 public class Calculator extends AppCompatActivity {
 
-    Button button0, button1, button2, button3, button4, button5, button6, button7, button8, button9, buttonAdd, buttonSub, buttonMult, buttonDiv, buttonC, buttonBack, buttonPercent, buttonDec, buttonEqual ;
+    // Arrays of digits and mathematic operations
+    private int[] digits = {R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four, R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine};
+    private int[] operations = {R.id.divide, R.id.multiply, R.id.subtract, R.id.add};
 
-    TextView editText ;
+    // 0 is divide, 1 is multiply, 2 is subtract, 3 is add
+    int prevOperation;
+    Float calculation;
 
-    float mValueOne, mValueTwo ;
+    // Variable representing the type of the last input character
+    // 0: none
+    // 1: digit
+    // 2: operation
+    int lastCharType = 0;
 
-    boolean mAddition, mSubtract, mMultiplication, mDivision ;
+    // Display variable
+    TextView display;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calculator);
 
-        button0 = (Button) findViewById(R.id.zero);
-        button1 = (Button) findViewById(R.id.one);
-        button2 = (Button) findViewById(R.id.two);
-        button3 = (Button) findViewById(R.id.three);
-        button4 = (Button) findViewById(R.id.four);
-        button5 = (Button) findViewById(R.id.five);
-        button6 = (Button) findViewById(R.id.six);
-        button7 = (Button) findViewById(R.id.seven);
-        button8 = (Button) findViewById(R.id.eight);
-        button9 = (Button) findViewById(R.id.nine);
-        buttonAdd = (Button) findViewById(R.id.add);
-        buttonSub = (Button) findViewById(R.id.subtract);
-        buttonMult = (Button) findViewById(R.id.multiply);
-        buttonDiv = (Button) findViewById(R.id.divide);
-        buttonDec = (Button) findViewById(R.id.decimal);
-        buttonPercent = (Button) findViewById(R.id.percent);
-        buttonBack = (Button) findViewById(R.id.backspace);
-        buttonC = (Button) findViewById(R.id.clear);
-        buttonEqual = (Button) findViewById(R.id.equals);
-        editText = (TextView) findViewById(R.id.display);
+        // Save reference to display
+        display = (TextView) findViewById(R.id.display);
 
-        button1.setOnClickListener(new View.OnClickListener() {
+        // Initialize button listeners
+        initDigitListeners();
+        initOperationListeners();
+    }
+
+    private void initDigitListeners() {
+
+        // Create a generic listener to be applied to all digits
+        View.OnClickListener listen = new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"1");
+            public void onClick(View e) {
+                Button currButton = (Button) e;
+                display.append(currButton.getText());
+
+                lastCharType = 1;
             }
-        });
+        };
 
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"2");
-            }
-        });
+        // Iterate through all digits and apply listener
+        for (int id : digits) findViewById(id).setOnClickListener(listen);
+    }
 
-        button3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"3");
-            }
-        });
+    private void initOperationListeners() {
 
-        button4.setOnClickListener(new View.OnClickListener() {
+        // Create a generic listener to be applied to all operations
+        View.OnClickListener listen = new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"4");
-            }
-        });
+            public void onClick(View e) {
 
-        button5.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"5");
-            }
-        });
+                if (display.getText() != null && lastCharType != 2) {
+                    Button currButton = (Button) e;
+                    Float currNum = Float.parseFloat(display.getText() + "");
 
-        button6.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"6");
-            }
-        });
+                    if (calculation == null) calculation = currNum;
+                    else {
+                        if (prevOperation == 0) calculation = calculation / currNum;
+                        else if (prevOperation == 1) calculation = calculation * currNum;
+                        else if (prevOperation == 2) calculation = calculation - currNum;
+                        else if (prevOperation == 3) calculation = calculation + currNum;
+                    }
 
-        button7.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"7");
-            }
-        });
-
-        button8.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"8");
-            }
-        });
-
-        button9.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"9");
-            }
-        });
-
-        button0.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+"0");
-            }
-        });
-
-        buttonAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (editText == null) {
-                    editText.setText("");
+                    switch (currButton.getId()) {
+                        case R.id.divide:
+                            prevOperation = 0;
+                            break;
+                        case R.id.multiply:
+                            prevOperation = 1;
+                            break;
+                        case R.id.subtract:
+                            prevOperation = 2;
+                            break;
+                        case R.id.add:
+                            prevOperation = 3;
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                else {
-                    mValueOne = Float.parseFloat(editText.getText() + "");
-                    mAddition = true;
-                    editText.setText(null);
-                }
-            }
-        });
-        buttonSub.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mValueOne = Float.parseFloat(editText.getText() + "");
-                mSubtract = true;
-                editText.setText(null);
-            }
-        });
-        buttonMult.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mValueOne = Float.parseFloat(editText.getText() + "");
-                mMultiplication = true;
-                editText.setText(null);
-            }
-        });
-        buttonDiv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mValueOne = Float.parseFloat(editText.getText() + "");
-                mDivision = true;
-                editText.setText(null);
-            }
-        });
-        buttonPercent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                float temp = Float.parseFloat(editText.getText() + "") ;
-                editText.setText(temp/100 + "");
-            }
-        });
-        buttonEqual.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mValueTwo = Float.parseFloat(editText.getText() + "");
 
-                if (mAddition == true){
-                    editText.setText(mValueOne + mValueTwo + "");
-                    mAddition = false;
-                }
-                if (mSubtract == true){
-                    editText.setText(mValueOne - mValueTwo + "");
-                    mSubtract = false;
-                }
-                if (mMultiplication == true){
-                    editText.setText(mValueOne * mValueTwo + "");
-                    mMultiplication = false;
-                }
-                if (mDivision == true){
-                    editText.setText(mValueOne / mValueTwo + "");
-                    mDivision = false;
-                }
+                display.setText("");
+                lastCharType = 2;
+            }
+        };
+
+        // Iterate through all operations and apply listener
+        for (int id : operations) findViewById(id).setOnClickListener(listen);
+
+        // Backspace button
+        findViewById(R.id.backspace).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String str = display.getText().toString();
+                if (str != null && str.length() > 0) str = str.substring(0, str.length()-1);
+                display.setText(str);
             }
         });
 
-        buttonC.setOnClickListener(new View.OnClickListener() {
+        // Clear button
+        findViewById(R.id.clear).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                editText.setText("");
-            }
-        });
-        buttonDec.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editText.setText(editText.getText()+".");
-            }
-        });
-        buttonBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String string = editText.getText().toString();
-                if (string.length() >=1 ) {
-                    string = string.substring(0, string.length() - 1);
-                    editText.setText(string);
-                }
+                display.setText("");
+                calculation = null;
+                lastCharType = 0;
             }
         });
 
+        // Percent button
+        findViewById(R.id.percent).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                float temp = Float.parseFloat(display.getText() + "") ;
+                display.setText(temp/100 + "");
+            }
+        });
 
+        // Equal button
+        findViewById(R.id.equals).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Float currNum = Float.parseFloat(display.getText() + "");
+                if (prevOperation == 0) calculation = calculation / currNum;
+                else if (prevOperation == 1) calculation = calculation * currNum;
+                else if (prevOperation == 2) calculation = calculation - currNum;
+                else if (prevOperation == 3) calculation = calculation + currNum;
 
+                lastCharType = 1;
+                prevOperation = -1;
 
-
-
+                display.setText(calculation + "");
+            }
+        });
     }
 }
