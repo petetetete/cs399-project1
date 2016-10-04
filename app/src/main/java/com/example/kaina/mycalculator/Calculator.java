@@ -10,7 +10,7 @@ import android.widget.TextView;
 public class Calculator extends AppCompatActivity {
 
     // Arrays of digits and mathematic operations
-    private int[] digits = {R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four, R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine};
+    private int[] digits = {R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four, R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine, R.id.decimal};
     private int[] operations = {R.id.divide, R.id.multiply, R.id.subtract, R.id.add};
 
     // 0 is divide, 1 is multiply, 2 is subtract, 3 is add
@@ -47,8 +47,7 @@ public class Calculator extends AppCompatActivity {
             @Override
             public void onClick(View e) {
                 Button currButton = (Button) e;
-                display.append(currButton.getText());
-
+                if (!(e.getId() == R.id.decimal && display.getText().toString().contains("."))) display.append(currButton.getText());
                 lastCharType = 1;
             }
         };
