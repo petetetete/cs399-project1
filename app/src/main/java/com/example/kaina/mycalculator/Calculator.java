@@ -9,13 +9,18 @@ import android.widget.TextView;
 
 public class Calculator extends AppCompatActivity {
 
-    // Arrays of digits and mathematic operations
+    // Arrays of digits and mathematical operations
     private int[] digits = {R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four, R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine, R.id.decimal};
     private int[] operations = {R.id.divide, R.id.multiply, R.id.subtract, R.id.add};
 
-    // 0 is divide, 1 is multiply, 2 is subtract, 3 is add
+    // Variable used to store the previous operation
+    // 0: divide
+    // 1: multiply
+    // 2: subtract
+    // 3: add
     int prevOperation;
-    Float calculation;
+
+    Float calculation; // Used to store the current overall calculation
 
     // Variable representing the type of the last input character
     // 0: none
@@ -23,8 +28,7 @@ public class Calculator extends AppCompatActivity {
     // 2: operation
     int lastCharType = 0;
 
-    // Display variable
-    TextView display;
+    TextView display; // Display variable
 
 
     @Override
@@ -63,10 +67,12 @@ public class Calculator extends AppCompatActivity {
             @Override
             public void onClick(View e) {
 
+                // Ensure that an operation is currently allowed
                 if (display.getText() != null && lastCharType != 2) {
                     Button currButton = (Button) e;
                     Float currNum = Float.parseFloat(display.getText() + "");
 
+                    // Depending on the previous operation, do the required math
                     if (calculation == null) calculation = currNum;
                     else {
                         if (prevOperation == 0) calculation = calculation / currNum;
@@ -75,6 +81,7 @@ public class Calculator extends AppCompatActivity {
                         else if (prevOperation == 3) calculation = calculation + currNum;
                     }
 
+                    // Save the current operation
                     switch (currButton.getId()) {
                         case R.id.divide:
                             prevOperation = 0;
@@ -93,6 +100,7 @@ public class Calculator extends AppCompatActivity {
                     }
                 }
 
+                // Reset the screen on operations
                 display.setText("");
                 lastCharType = 2;
             }
@@ -134,16 +142,18 @@ public class Calculator extends AppCompatActivity {
         findViewById(R.id.equals).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Float currNum = Float.parseFloat(display.getText() + "");
-                if (prevOperation == 0) calculation = calculation / currNum;
-                else if (prevOperation == 1) calculation = calculation * currNum;
-                else if (prevOperation == 2) calculation = calculation - currNum;
-                else if (prevOperation == 3) calculation = calculation + currNum;
+                if (lastCharType != 2) {
+                    Float currNum = Float.parseFloat(display.getText() + "");
+                    if (prevOperation == 0) calculation = calculation / currNum;
+                    else if (prevOperation == 1) calculation = calculation * currNum;
+                    else if (prevOperation == 2) calculation = calculation - currNum;
+                    else if (prevOperation == 3) calculation = calculation + currNum;
 
-                lastCharType = 1;
-                prevOperation = -1;
+                    lastCharType = 1;
+                    prevOperation = -1;
 
-                display.setText(calculation + "");
+                    display.setText(calculation + "");
+                }
             }
         });
     }
